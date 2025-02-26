@@ -1,4 +1,4 @@
-# 🔗 Referral Service
+# 🔗 Referral System
 
 ## 📑 Стэк
 - **Python**
