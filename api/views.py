@@ -17,10 +17,10 @@ User = get_user_model()
 
 class ReferralCodeView(APIView):
     permission_classes = [IsAuthenticated]
+
     @swagger_auto_schema(
         request_body=ReferralCodeSerializer,
     )
-
     def post(self, request):
         user = request.user
         if ReferralCode.objects.filter(user=user).exists():
@@ -52,8 +52,40 @@ class ReferralCodeView(APIView):
         )
 
 
+class ReferralView(APIView):
+    permission_classes = [IsAuthenticated]
+
+    def get(self, request, pk):
+        try:
+            referrer = User.objects.get(id=pk)
+            referrals = referrer.referrals.all()
+            serializer = ReferralSerializer(referrals, many=True)
+            return Response(serializer.data, status=status.HTTP_200_OK)
+        except User.DoesNotExist:
+            return Response(
+                {"detail": "Referrer not found."},
+                status=status.HTTP_404_NOT_FOUND
+            )
+
+
+class RegisterWithReferralView(APIView):
+    permission_classes = [AllowAny]
+
+    @swagger_auto_schema(
+        request_body=RegisterWithReferralSerializer,)
+    def post(self, request):
+        serializer = RegisterWithReferralSerializer(data=request.data)
+        if serializer.is_valid():
+            serializer.save()
+            return Response(
+                {"message": "User registered successfully"},
+                status=status.HTTP_201_CREATED
+            )
+        return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+
+
 class GetByEmailView(APIView):
-    
+
     def get(self, request):
         user = request.user
         try:
@@ -78,35 +110,3 @@ class GetByEmailView(APIView):
                 status=status.HTTP_200_OK
             )
         raise ValidationError("User does not have a valid email address.")
-
-
-class ReferralView(APIView):
-    permission_classes = [IsAuthenticated]
-
-    def get(self, request, pk):
-        try:
-            referrer = User.objects.get(id=pk)
-            referrals = referrer.referrals.all()
-            serializer = ReferralSerializer(referrals, many=True)
-            return Response(serializer.data, status=status.HTTP_200_OK)
-        except User.DoesNotExist:
-            return Response(
-                {"detail": "Referrer not found."},
-                status=status.HTTP_404_NOT_FOUND
-            )
-
-
-class RegisterWithReferralView(APIView):
-    permission_classes = [AllowAny]
-    @swagger_auto_schema(
-        request_body=RegisterWithReferralSerializer,)
-
-    def post(self, request):
-        serializer = RegisterWithReferralSerializer(data=request.data)
-        if serializer.is_valid():
-            serializer.save()
-            return Response(
-                {"message": "User registered successfully"},
-                status=status.HTTP_201_CREATED
-            )
-        return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
