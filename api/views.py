@@ -17,6 +17,9 @@ User = get_user_model()
 
 class ReferralCodeView(APIView):
     permission_classes = [IsAuthenticated]
+    @swagger_auto_schema(
+        request_body=ReferralCodeSerializer,
+    )
 
     def post(self, request):
         user = request.user
@@ -50,7 +53,7 @@ class ReferralCodeView(APIView):
 
 
 class GetByEmailView(APIView):
-
+    
     def get(self, request):
         user = request.user
         try:
@@ -95,6 +98,8 @@ class ReferralView(APIView):
 
 class RegisterWithReferralView(APIView):
     permission_classes = [AllowAny]
+    @swagger_auto_schema(
+        request_body=RegisterWithReferralSerializer,)
 
     def post(self, request):
         serializer = RegisterWithReferralSerializer(data=request.data)
