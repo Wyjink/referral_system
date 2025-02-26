@@ -1,6 +1,6 @@
-# :🔗: Referral Service
+# 🔗 Referral Service
 
-## :📑: Стэк
+## 📑 Стэк
 - **Python**
 - **Django**
 - **SQLite**
